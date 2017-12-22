@@ -1,9 +1,10 @@
 'use strict';
 
-var expect     = require('chai').expect;
+var pathSep = require('path').sep;
+var expect = require('chai').expect;
 var Metalsmith = require('metalsmith');
-var Multilang  = require('../lib/multilang');
-var noop       = function () {};
+var Multilang = require('../lib/multilang');
+var noop = function () { };
 
 describe('/lib/multilang.js', function () {
     var multilang = new Multilang({ default: 'es', locales: ['en', 'es'] });
@@ -54,7 +55,7 @@ describe('/lib/multilang.js', function () {
 
     describe('getPlugin()', function () {
         it('should add `defaultLocale` and `locales` to Metalsmith metadata', function () {
-            var ms     = Metalsmith(__dirname);
+            var ms = Metalsmith(__dirname);
             var plugin = multilang.getPlugin();
 
             plugin([], ms, noop);
@@ -66,24 +67,24 @@ describe('/lib/multilang.js', function () {
         });
 
         it('should handle index files gracefully', function () {
-            var ms     = Metalsmith(__dirname);
+            var ms = Metalsmith(__dirname);
             var plugin = multilang.getPlugin();
-            var files  = { 'index_en.html': {}, 'index_es.html': {} };
+            var files = { 'index_en.html': {}, 'index_es.html': {} };
 
             plugin(files, ms, noop);
 
             expect(files).not.to.have.property('index_en.html');
             expect(files).not.to.have.property('index_es.html');
             expect(files).to.have.property('index.html');
-            expect(files).to.have.property('en/index.html');
+            expect(files).to.have.property(`en${pathSep}index.html`);
             expect(files['index.html'].path).to.equal('');
-            expect(files['en/index.html'].path).to.equal('en/');
+            expect(files[`en${pathSep}index.html`].path).to.equal('en/');
         });
 
         it('should add `locale` property to files', function () {
-            var ms     = Metalsmith(__dirname);
+            var ms = Metalsmith(__dirname);
             var plugin = multilang.getPlugin();
-            var files  = { 'rand.md': {}, 'file_ca.md': {}, 'file_en.md': {}, 'file_es.md': {} };
+            var files = { 'rand.md': {}, 'file_ca.md': {}, 'file_en.md': {}, 'file_es.md': {} };
 
             plugin(files, ms, noop);
 
@@ -94,9 +95,9 @@ describe('/lib/multilang.js', function () {
         });
 
         it('should merge main (default) locale properties into the secondary locales', function () {
-            var ms     = Metalsmith(__dirname);
+            var ms = Metalsmith(__dirname);
             var plugin = multilang.getPlugin();
-            var files  = {
+            var files = {
                 'file_es.md': { base: 'copy-this', title: 'es' }, // main
                 'file_en.md': { title: 'en', other: 'leave' }     // secondary
             };
@@ -112,9 +113,9 @@ describe('/lib/multilang.js', function () {
         });
 
         it('should add `lang` method in each file to retrieve the alternative language file', function () {
-            var ms     = Metalsmith(__dirname);
+            var ms = Metalsmith(__dirname);
             var plugin = multilang.getPlugin();
-            var files  = { 'file_es.md': { title: 'es' }, 'file_en.md': { title: 'en' } };
+            var files = { 'file_es.md': { title: 'es' }, 'file_en.md': { title: 'en' } };
 
             plugin(files, ms, noop);
 
@@ -131,9 +132,9 @@ describe('/lib/multilang.js', function () {
         });
 
         it('should throw an expection if alt file does not exist when calling `lang`', function () {
-            var ms     = Metalsmith(__dirname);
+            var ms = Metalsmith(__dirname);
             var plugin = multilang.getPlugin();
-            var files  = { 'file_es.md': { title: 'es' }, 'file_en.md': { title: 'en' } };
+            var files = { 'file_es.md': { title: 'es' }, 'file_en.md': { title: 'en' } };
 
             plugin(files, ms, noop);
 
@@ -145,7 +146,7 @@ describe('/lib/multilang.js', function () {
 
     describe('merge()', function () {
         it('should merge two objects', function () {
-            var a = { base: 'a', title: 'a'};
+            var a = { base: 'a', title: 'a' };
             var b = { title: 'b', other: 'b' };
 
             multilang.merge(a, b);
